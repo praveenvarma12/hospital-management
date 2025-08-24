@@ -135,6 +135,8 @@ const MyAppointments = () => {
                         <div className='flex-1 text-sm text-[#5E5E5E]'>
                             <p className='text-[#262626] text-base font-semibold'>{item.docData.name}</p>
                             <p>{item.docData.speciality}</p>
+                            {item.docData.hospitalName && <p className='text-[#464646] font-medium mt-1'>Hospital</p>}
+                            {item.docData.hospitalName && <p className=''>{item.docData.hospitalName} - {item.docData.hospitalLocation}</p>}
                             <p className='text-[#464646] font-medium mt-1'>Address:</p>
                             <p className=''>{item.docData.address.line1}</p>
                             <p className=''>{item.docData.address.line2}</p>

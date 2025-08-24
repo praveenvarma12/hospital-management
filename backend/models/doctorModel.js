@@ -11,6 +11,10 @@ const doctorSchema = new mongoose.Schema({
     about: { type: String, required: true },
     available: { type: Boolean, default: true },
     fees: { type: Number, required: true },
+    // Hospital details
+    hospitalName: { type: String, default: '' },
+    hospitalLocation: { type: String, default: '' },
+    mapLink: { type: String, default: '' },
     slots_booked: { type: Object, default: {} },
     address: { type: Object, required: true },
     date: { type: Number, required: true },

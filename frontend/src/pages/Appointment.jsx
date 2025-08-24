@@ -155,6 +155,14 @@ const Appointment = () => {
                         <p className='text-sm text-gray-600 max-w-[700px] mt-1'>{docInfo.about}</p>
                     </div>
 
+                    {docInfo.hospitalName && (
+                        <div className='mt-3'>
+                            <p className='text-sm font-medium text-gray-700'>Hospital</p>
+                            <p className='text-sm text-gray-600'>{docInfo.hospitalName} - {docInfo.hospitalLocation}</p>
+                            {docInfo.mapLink && <a className='text-primary text-sm mt-1 inline-block' href={docInfo.mapLink} target='_blank' rel='noreferrer'>Get Directions</a>}
+                        </div>
+                    )}
+
                     <p className='text-gray-600 font-medium mt-4'>Appointment fee: <span className='text-gray-800'>{currencySymbol}{docInfo.fees}</span> </p>
                 </div>
             </div>

@@ -18,6 +18,9 @@ const AddDoctor = () => {
     const [degree, setDegree] = useState('')
     const [address1, setAddress1] = useState('')
     const [address2, setAddress2] = useState('')
+    const [hospitalName, setHospitalName] = useState('')
+    const [hospitalLocation, setHospitalLocation] = useState('')
+    const [mapLink, setMapLink] = useState('')
 
     const { backendUrl } = useContext(AppContext)
     const { aToken } = useContext(AdminContext)
@@ -43,6 +46,9 @@ const AddDoctor = () => {
             formData.append('speciality', speciality)
             formData.append('degree', degree)
             formData.append('address', JSON.stringify({ line1: address1, line2: address2 }))
+            formData.append('hospitalName', hospitalName)
+            formData.append('hospitalLocation', hospitalLocation)
+            formData.append('mapLink', mapLink)
 
             // console log formdata            
             formData.forEach((value, key) => {
@@ -152,6 +158,17 @@ const AddDoctor = () => {
                             <p>Address</p>
                             <input onChange={e => setAddress1(e.target.value)} value={address1} className='border rounded px-3 py-2' type="text" placeholder='Address 1' required />
                             <input onChange={e => setAddress2(e.target.value)} value={address2} className='border rounded px-3 py-2' type="text" placeholder='Address 2' required />
+                        </div>
+
+                        <div className='flex-1 flex flex-col gap-1'>
+                            <p>Hospital name</p>
+                            <input onChange={e => setHospitalName(e.target.value)} value={hospitalName} className='border rounded px-3 py-2' type="text" placeholder='Hospital name' />
+
+                            <p className='mt-2'>Hospital location (city/address)</p>
+                            <input onChange={e => setHospitalLocation(e.target.value)} value={hospitalLocation} className='border rounded px-3 py-2' type="text" placeholder='Hospital location' />
+
+                            <p className='mt-2'>Google Map link (optional)</p>
+                            <input onChange={e => setMapLink(e.target.value)} value={mapLink} className='border rounded px-3 py-2' type="text" placeholder='https://maps.google.com/...' />
                         </div>
 
                     </div>

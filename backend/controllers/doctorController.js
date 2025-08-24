@@ -91,15 +91,57 @@ const appointmentComplete = async (req, res) => {
 // API to get all doctors list for Frontend
 const doctorList = async (req, res) => {
     try {
+        // fetch as plain objects and exclude sensitive fields
+        const doctors = await doctorModel.find({}).select(['-password', '-email']).lean()
 
-        const doctors = await doctorModel.find({}).select(['-password', '-email'])
-        res.json({ success: true, doctors })
+        // strip any image fields so the frontend "all doctors" list cannot show the small image
+        const cleaned = doctors.map(({ profileImage, avatar, photo, ...rest }) => rest)
+
+        res.json({ success: true, doctors: cleaned })
 
     } catch (error) {
         console.log(error)
         res.json({ success: false, message: error.message })
     }
+}
 
+// API to search doctors by a free-text query across name, speciality, hospitalName, hospitalLocation
+const searchDoctors = async (req, res) => {
+    try {
+        // Accept a single q param (preferred) or fall back to legacy name/hospitalName/location params
+        const { q, speciality } = req.query
+        const legacyName = req.query.name || req.query.hospitalName || req.query.location || ''
+        const searchTerm = (q || legacyName || '').trim()
+
+        const mainQuery = {}
+
+        // speciality acts as an AND filter
+        if (speciality) {
+            mainQuery.speciality = { $regex: speciality, $options: 'i' }
+        }
+
+        if (searchTerm) {
+            // perform OR across multiple fields so single search term matches any of them
+            mainQuery.$or = [
+                { name: { $regex: searchTerm, $options: 'i' } },
+                { hospitalName: { $regex: searchTerm, $options: 'i' } },
+                { hospitalLocation: { $regex: searchTerm, $options: 'i' } },
+                { speciality: { $regex: searchTerm, $options: 'i' } }
+            ]
+        }
+
+        // fetch as plain objects and exclude sensitive fields
+        const doctors = await doctorModel.find(mainQuery).select(['-password', '-email']).lean()
+
+        // strip image fields to prevent the small image from being returned to the listing UI
+        const cleaned = doctors.map(({ profileImage, avatar, photo, ...rest }) => rest)
+
+        res.json({ success: true, doctors: cleaned })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
 }
 
 // API to change doctor availablity for Admin and Doctor Panel
@@ -137,11 +179,16 @@ const doctorProfile = async (req, res) => {
 const updateDoctorProfile = async (req, res) => {
     try {
 
-        const { docId, fees, address, available } = req.body
+    const { docId, fees, address, available, hospitalName, hospitalLocation, mapLink } = req.body
 
-        await doctorModel.findByIdAndUpdate(docId, { fees, address, available })
+    const update = { fees, address, available }
+    if (hospitalName !== undefined) update.hospitalName = hospitalName
+    if (hospitalLocation !== undefined) update.hospitalLocation = hospitalLocation
+    if (mapLink !== undefined) update.mapLink = mapLink
 
-        res.json({ success: true, message: 'Profile Updated' })
+    await doctorModel.findByIdAndUpdate(docId, update)
+
+    res.json({ success: true, message: 'Profile Updated' })
 
     } catch (error) {
         console.log(error)
@@ -195,6 +242,7 @@ export {
     appointmentsDoctor,
     appointmentCancel,
     doctorList,
+    searchDoctors,
     changeAvailablity,
     appointmentComplete,
     doctorDashboard,
